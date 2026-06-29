@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}CrackGPT — Upload Notes{% endblock %}
+
+{% block content %}
+<div class="text-center mb-4">
+  <h2 class="fw-bold">Turn your notes into a mock interview</h2>
+  <p class="text-secondary">Upload study material, get asked real questions, and see exactly what you're missing.</p>
+</div>
+
+<div class="row justify-content-center mb-5">
+  <div class="col-md-7">
+    <div class="card p-4">
+      <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+        <div class="upload-zone mb-3">
+          <i class="bi bi-cloud-arrow-up display-4 text-primary"></i>
+          <p class="mt-2 mb-3 text-secondary">PDF or TXT — your notes, slides, or summaries</p>
+          <input type="file" name="notes_file" accept=".pdf,.txt" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-magic"></i> Generate Interview Questions
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<h5 class="mb-3"><i class="bi bi-folder2-open"></i> Previously uploaded</h5>
+<div class="row g-3">
+  {% for doc in documents %}
+  <div class="col-md-4">
+    <div class="card p-3">
+      <div class="fw-semibold text-truncate">{{ doc.original_filename }}</div>
+      <div class="text-secondary small mb-3">{{ doc.num_chunks }} chunks · {{ doc.uploaded_at.strftime('%d %b %Y') }}</div>
+      <a href="{{ url_for('generate_quiz', doc_id=doc.id) }}" class="btn btn-sm btn-outline-primary">
+        <i class="bi bi-play-fill"></i> New Quiz from this
+      </a>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-secondary">No notes uploaded yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

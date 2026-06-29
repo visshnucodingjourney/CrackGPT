@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Results — CrackGPT{% endblock %}
+
+{% block content %}
+<div class="card p-4 mb-4 text-center">
+  <div class="display-4 fw-bold {{ 'text-success' if session.percentage >= 70 else 'text-warning' if session.percentage >= 40 else 'text-danger' }}">
+    {{ session.percentage }}%
+  </div>
+  <div class="text-secondary">{{ session.total_score|round(1) }} / {{ session.max_score|round(1) }} points</div>
+</div>
+
+{% for q in questions %}
+{% set a = q.answer %}
+<div class="card p-4 mb-3">
+  <div class="d-flex justify-content-between align-items-start mb-2">
+    <span class="fw-semibold">Q{{ loop.index }}. {{ q.question_text }}</span>
+    {% if a %}
+    <span class="score-pill {{ 'score-high' if a.score >= 7 else 'score-mid' if a.score >= 4 else 'score-low' }}">
+      {{ a.score|round(1) }} / 10
+    </span>
+    {% endif %}
+  </div>
+
+  {% if a %}
+  <div class="mb-2">
+    <div class="small text-secondary mb-1">Your answer:</div>
+    <div class="p-2 rounded" style="background:#1d212c;">{{ a.user_answer or '— no answer submitted —' }}</div>
+  </div>
+
+  {% if a.missing_points %}
+  <div class="mb-2">
+    <div class="small text-secondary mb-1">Missing points:</div>
+    <ul class="mb-0">
+      {% for point in a.missing_points.split('\n') if point.strip() %}
+      <li class="text-warning">{{ point }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {% if a.feedback %}
+  <div class="mb-2">
+    <div class="small text-secondary mb-1">Feedback:</div>
+    <div>{{ a.feedback }}</div>
+  </div>
+  {% endif %}
+  {% endif %}
+
+  <details class="mt-2">
+    <summary class="text-primary small" style="cursor:pointer;">Show ideal answer</summary>
+    <div class="p-2 mt-2 rounded" style="background:#1d212c;">{{ q.ideal_answer }}</div>
+  </details>
+</div>
+{% endfor %}
+
+<a href="{{ url_for('index') }}" class="btn btn-outline-light">
+  <i class="bi bi-arrow-left"></i> Back to Upload
+</a>
+{% endblock %}

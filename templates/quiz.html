@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Quiz — CrackGPT{% endblock %}
+
+{% block content %}
+<h4 class="mb-1">Mock Interview</h4>
+<p class="text-secondary mb-4">Answer each question in your own words. Be as complete as you can — scoring checks for missing points too.</p>
+
+<form action="{{ url_for('submit_quiz', session_id=session.id) }}" method="POST">
+  {% for q in questions %}
+  <div class="card question-card p-4 mb-3">
+    <div class="d-flex justify-content-between mb-2">
+      <span class="fw-semibold">Question {{ loop.index }}</span>
+      <span class="difficulty-{{ q.difficulty }} small text-uppercase fw-bold">{{ q.difficulty }}</span>
+    </div>
+    <p class="mb-3">{{ q.question_text }}</p>
+    <textarea name="answer_{{ q.id }}" class="form-control" rows="4"
+              placeholder="Type your answer here..."></textarea>
+  </div>
+  {% endfor %}
+
+  <button type="submit" class="btn btn-primary w-100 py-2">
+    <i class="bi bi-send-check"></i> Submit Answers for Scoring
+  </button>
+</form>
+{% endblock %}

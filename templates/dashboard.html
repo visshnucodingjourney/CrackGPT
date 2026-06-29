@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — CrackGPT{% endblock %}
+
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-graph-up-arrow"></i> Score History</h4>
+
+<div class="card p-4 mb-4">
+  <canvas id="scoreChart" height="90"></canvas>
+</div>
+
+<div class="card">
+  <table class="table table-dark table-hover mb-0">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Questions</th>
+        <th>Score</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in sessions %}
+      <tr>
+        <td>{{ s.completed_at.strftime('%d %b %Y, %H:%M') }}</td>
+        <td>{{ s.questions.count() }}</td>
+        <td>
+          <span class="score-pill {{ 'score-high' if s.percentage >= 70 else 'score-mid' if s.percentage >= 40 else 'score-low' }}">
+            {{ s.percentage }}%
+          </span>
+        </td>
+        <td><a href="{{ url_for('results', session_id=s.id) }}" class="btn btn-sm btn-outline-primary">View</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center text-secondary py-4">No completed sessions yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script>
+const ctx = document.getElementById('scoreChart');
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: {{ chart_labels|tojson }},
+    datasets: [{
+      label: 'Score %',
+      data: {{ chart_scores|tojson }},
+      borderColor: '#6366f1',
+      backgroundColor: 'rgba(99,102,241,0.15)',
+      tension: 0.3,
+      fill: true,
+      pointRadius: 4,
+    }]
+  },
+  options: {
+    scales: {
+      y: { beginAtZero: true, max: 100, ticks: { color: '#9aa3b2' } },
+      x: { ticks: { color: '#9aa3b2' } }
+    },
+    plugins: { legend: { labels: { color: '#e6e8ee' } } }
+  }
+});
+</script>
+{% endblock %}
